@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Kompass</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;1,6..72,400&family=Amiri:wght@400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EDF1F4; --surface:#FFFFFF; --ink:#1A2436; --muted:#566275; --line:#D5DCE5;
+  --accent:#2C6A64; --accent-soft:#D7E8E4; --on-accent:#FFFFFF; --dawn:#B9821F; --dawn-soft:#F3E6CC;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0E1828; --surface:#16233A; --ink:#E5EAF1; --muted:#9BA7B9; --line:#273652;
+    --accent:#76C0B4; --accent-soft:#1D3A45; --on-accent:#0E1828; --dawn:#E6B75C; --dawn-soft:#3A3121;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0E1828; --surface:#16233A; --ink:#E5EAF1; --muted:#9BA7B9; --line:#273652;
+  --accent:#76C0B4; --accent-soft:#1D3A45; --on-accent:#0E1828; --dawn:#E6B75C; --dawn-soft:#3A3121;
+  color-scheme:dark;
+}
+*,*::before,*::after{box-sizing:inherit}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Figtree",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-size:17px;line-height:1.5;-webkit-font-smoothing:antialiased}
+body.locked{overflow:hidden}
+button,input,textarea{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--dawn);outline-offset:2px;border-radius:8px}
+.app{max-width:560px;margin:0 auto;padding:20px 20px calc(104px + env(safe-area-inset-bottom,0px))}
+.top{display:flex;align-items:center;gap:10px;font-weight:600;font-size:1rem}
+.top svg{width:22px;height:22px}
+.date{color:var(--muted);margin:22px 0 0;font-size:.95rem}
+h1{font-size:2rem;line-height:1.15;font-weight:600;margin:2px 0 8px;letter-spacing:-.015em}
+h2{font-size:1.2rem;line-height:1.3;font-weight:600;margin:36px 0 8px}
+h3{font-size:1.05rem;margin:0 0 6px;font-weight:600}
+p{margin:0 0 12px}
+.lead{color:var(--muted);max-width:34em}
+.hint{color:var(--muted);font-size:.95rem;margin-bottom:14px}
+.stack{display:grid;gap:10px;margin-top:8px}
+
+/* Stern */
+.sos{display:block;width:100%;background:none;border:0;padding:10px 0 14px;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.sos svg{display:block;width:min(70vw,270px);height:auto;margin:0 auto}
+.star{fill:var(--accent);transform-box:fill-box;transform-origin:center;transition:transform .18s ease}
+.sos:hover .star{transform:rotate(22.5deg)}
+.sos:active .star{transform:rotate(22.5deg) scale(.96)}
+.star-inner{fill:none;stroke:var(--on-accent);stroke-opacity:.35;stroke-width:1.5}
+.sos-t{fill:var(--on-accent);font-family:"Figtree",system-ui,sans-serif;font-weight:600;font-size:25px}
+
+/* Buttons */
+.btn{display:block;width:100%;border:0;border-radius:14px;padding:15px 18px;font-weight:600;cursor:pointer;text-align:center;text-decoration:none}
+.btn.primary{background:var(--ink);color:var(--bg)}
+.btn.accent{background:var(--accent);color:var(--on-accent)}
+.btn.secondary{background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.btn.quiet{background:none;color:var(--muted);font-weight:500;padding:10px}
+.btn.small{width:auto;padding:10px 14px;border-radius:12px;font-size:.95rem}
+.btn:disabled{opacity:.45;cursor:default}
+.row{display:flex;gap:10px}
+.row>.btn{flex:1}
+
+/* Impuls */
+.impulse{border-left:3px solid var(--dawn);padding:4px 0 4px 18px;margin:8px 0 18px}
+.verse{font-family:"Newsreader",Georgia,serif;font-size:1.22rem;line-height:1.55;margin-bottom:10px}
+.body{margin-bottom:10px}
+.ar{font-family:"Amiri","Noto Naskh Arabic","Geeza Pro","Traditional Arabic",serif;direction:rtl;text-align:right;font-size:1.6rem;line-height:2.1;margin:0 0 8px}
+.tr{font-style:italic;color:var(--muted);font-size:.95rem}
+.note{color:var(--muted);font-size:.95rem}
+.src{font-size:.85rem;color:var(--muted);margin:0}
+
+/* Listen und Formulare */
+.list{list-style:none;margin:0 0 12px;padding:0;border-top:1px solid var(--line)}
+.list li{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--line)}
+.list li>span{flex:1;min-width:0;overflow-wrap:anywhere}
+.list small{display:block;color:var(--muted);font-size:.82rem}
+.del{border:0;background:none;color:var(--muted);font-size:1.4rem;line-height:1;cursor:pointer;padding:4px 8px;border-radius:8px}
+.check{flex:none;width:26px;height:26px;border-radius:8px;border:2px solid var(--line);background:none;cursor:pointer;display:grid;place-items:center;padding:0}
+.check svg{width:16px;height:16px;opacity:0}
+.check[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.check[aria-pressed="true"] svg{opacity:1}
+.done-text{color:var(--muted);text-decoration:line-through}
+.add{display:flex;gap:8px;flex-wrap:wrap}
+.add input{flex:1 1 180px}
+input[type=text],input[type=tel],textarea{width:100%;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+textarea{min-height:88px;resize:vertical}
+label.q{display:block;font-weight:600;margin:22px 0 8px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:8px 14px;cursor:pointer;font-size:.95rem}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.range{display:flex;align-items:center;gap:14px}
+.range input{flex:1;accent-color:var(--accent);height:32px}
+.range output{min-width:2.5ch;font-weight:700;font-size:1.3rem;text-align:right}
+.scale{display:flex;justify-content:space-between;color:var(--muted);font-size:.82rem;margin-top:-2px}
+
+/* Muster */
+.facts p{font-size:1.05rem}
+.facts b{font-weight:700;color:var(--accent)}
+.chart{overflow-x:auto;margin:6px 0 4px}
+.chart svg{display:block;width:100%;min-width:300px;height:auto}
+.bar{fill:var(--accent)}
+.bar.rel{fill:var(--dawn)}
+.tick{fill:var(--line)}
+.axis{fill:var(--muted);font-size:9px;font-family:"Figtree",system-ui,sans-serif}
+.legend{font-size:.85rem;color:var(--muted);display:flex;gap:16px;flex-wrap:wrap}
+.legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:6px;vertical-align:baseline}
+.hbars{display:grid;gap:8px}
+.hbar{display:grid;grid-template-columns:7.5em 1fr 2ch;align-items:center;gap:10px;font-size:.95rem}
+.hbar .track{height:10px;background:var(--accent-soft);border-radius:5px;overflow:hidden}
+.hbar .fill{height:100%;background:var(--accent);border-radius:5px}
+.hbar.dawn .fill{background:var(--dawn)}
+.hbar .n{color:var(--muted);text-align:right}
+.empty{background:var(--surface);border:1px dashed var(--line);border-radius:16px;padding:22px;color:var(--muted)}
+
+/* Navigation */
+nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
+nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
+nav.tabs button{background:none;border:0;padding:10px 4px 12px;display:grid;justify-items:center;gap:3px;font-size:.78rem;color:var(--muted);cursor:pointer}
+nav.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
+
+/* Overlay */
+.overlay{position:fixed;inset:0;z-index:40;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch;padding:calc(env(safe-area-inset-top,0px) + 14px) 20px calc(env(safe-area-inset-bottom,0px) + 28px)}
+.overlay[hidden]{display:none}
+.ov{max-width:560px;margin:0 auto}
+.ov-head{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:10px}
+.timer{display:flex;align-items:center;gap:10px;font-variant-numeric:tabular-nums;font-weight:600}
+.timer svg{width:46px;height:46px}
+.timer .trk{fill:none;stroke:var(--line);stroke-width:7}
+.timer .prg{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;transform:rotate(-90deg);transform-origin:50% 50%;transition:stroke-dashoffset 1s linear}
+.timer .mini{fill:var(--dawn)}
+.timer small{display:block;font-weight:400;color:var(--muted);font-size:.8rem}
+.close{background:none;border:1px solid var(--line);border-radius:999px;padding:8px 14px;cursor:pointer;color:var(--muted)}
+.step-n{color:var(--muted);font-size:.9rem;margin:18px 0 2px}
+.ov h2{font-size:1.6rem;margin:0 0 12px;letter-spacing:-.01em}
+.ov-foot{display:grid;gap:8px;margin-top:28px}
+.dua{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px 18px;margin:12px 0}
+.breath{display:grid;place-items:center;margin:20px 0 6px}
+.breath svg{width:190px;height:190px}
+.breath .star{animation:breathe 10s ease-in-out infinite}
+@keyframes breathe{0%{transform:scale(.55)}40%{transform:scale(1)}100%{transform:scale(.55)}}
+.breath-l{text-align:center;font-weight:600;font-size:1.15rem;min-height:1.6em}
+.contact{display:flex;justify-content:space-between;align-items:center}
+.toast{position:fixed;left:50%;bottom:calc(84px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;z-index:60;max-width:calc(100% - 40px);font-size:.95rem;box-shadow:0 6px 24px rgba(0,0,0,.18)}
+.toast[hidden]{display:none}
+.warn{background:var(--dawn-soft);border-radius:12px;padding:12px 14px;font-size:.95rem;margin-top:12px}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg .chip{border-radius:12px;padding:12px;text-align:center}
+.help p{font-size:.97rem}
+.help a{color:var(--accent);font-weight:600}
+@media (prefers-reduced-motion: reduce){
+  .breath .star{animation:none;transform:scale(.8)}
+  .star,.timer .prg{transition:none}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="top" aria-label="Kompass">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><polygon id="logoStar" style="fill:var(--accent)"/></svg>
+    <span>Kompass</span>
+  </div>
+  <main id="main"></main>
+</div>
+
+<nav class="tabs" aria-label="Hauptnavigation">
+  <div class="in">
+    <button data-action="nav" data-view="heute"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Heute</button>
+    <button data-action="nav" data-view="muster"><svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5"/></svg>Muster</button>
+    <button data-action="nav" data-view="plan"><svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M4 6l1.3 1.3L7.5 5M4 12l1.3 1.3L7.5 11M4 18l1.3 1.3L7.5 17"/></svg>Plan</button>
+    <button data-action="nav" data-view="impulse"><svg viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 016.5 3H19v15H6.5A1.5 1.5 0 005 19.5z"/><path d="M5 19.5A1.5 1.5 0 006.5 21H19"/></svg>Impulse</button>
+  </div>
+</nav>
+
+<div class="overlay" id="overlay" hidden role="dialog" aria-modal="true"></div>
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script>
+/* ---------- Inhalte ---------- */
+const IMPULSE = [
+  {ref:'Sure 39:53 (az-Zumar)', ar:'قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ ۚ إِنَّ اللَّهَ يَغْفِرُ الذُّنُوبَ جَمِيعًا ۚ إِنَّهُ هُوَ الْغَفُورُ الرَّحِيمُ', de:'Sag: „O meine Diener, die ihr gegen euch selbst maßlos gewesen seid, verliert nicht die Hoffnung auf Allahs Barmherzigkeit. Allah vergibt die Sünden allesamt. Er ist der Allvergebende, der Barmherzige.“', note:'Dieser Vers richtet sich ausdrücklich an Menschen, die sich selbst Schaden zugefügt haben. Die Hoffnung nicht aufzugeben ist hier kein Trost, sondern ein Gebot.'},
+  {title:'Ein Drang ist eine Welle', de:'Ein Drang steigt an, erreicht einen Höhepunkt und flacht wieder ab, meist innerhalb von 15 bis 30 Minuten. Du musst ihn nicht wegdrücken. Du musst ihm nur nicht folgen.'},
+  {ref:'Sure 94:5–6 (ash-Sharh)', de:'Denn wahrlich, mit der Schwierigkeit kommt Erleichterung. Wahrlich, mit der Schwierigkeit kommt Erleichterung.', note:'Der Vers wiederholt sich. Die Erleichterung kommt nicht erst nach der Schwierigkeit, sondern mit ihr.'},
+  {title:'Ein Rückfall ist kein Neustart', de:'Nach einem Ausrutscher sagt das Gehirn: „Jetzt ist eh alles kaputt.“ Das ist der gefährlichste Gedanke im ganzen Prozess. Alles, was du gelernt und aufgebaut hast, ist noch da.'},
+  {ref:'Sure 2:286 (al-Baqara)', de:'Allah erlegt keiner Seele mehr auf, als sie zu tragen vermag.', note:'Du bist für diesen Weg ausgestattet, auch an Tagen, an denen es sich nicht so anfühlt.'},
+  {title:'HALT', de:'Hungrig, wütend, einsam, müde. Die meisten Rückfälle passieren in einem dieser Zustände. Wer sie früh bemerkt, kann gegensteuern, bevor der Drang überhaupt kommt.'},
+  {ref:'Sure 13:28 (ar-Ra‘d)', de:'Wahrlich, im Gedenken Allahs finden die Herzen Ruhe.', note:'Innere Unruhe ist einer der häufigsten Auslöser. Dhikr ist ein Werkzeug, das du immer dabeihast.'},
+  {title:'Umgebung schlägt Willenskraft', de:'Willenskraft ist am Abend am schwächsten. Ein Handy, das nachts außerhalb des Schlafzimmers liegt, braucht keine Willenskraft mehr.'},
+  {ref:'Sure 2:153 (al-Baqara)', de:'O ihr, die ihr glaubt, sucht Hilfe in Geduld und Gebet. Allah ist mit den Geduldigen.', note:'Geduld heißt nicht, nichts zu fühlen. Es heißt, nicht jedem Gefühl zu folgen.'},
+  {title:'Reue ist nicht Scham', de:'Reue sagt: „Ich habe etwas Falsches getan.“ Scham sagt: „Ich bin falsch.“ Reue führt zurück zu Allah und zu dir selbst. Scham führt oft direkt in den nächsten Rückfall.'},
+  {ref:'Sure 24:30 (an-Nur)', de:'Sag den gläubigen Männern, sie sollen ihre Blicke senken und ihre Keuschheit wahren. Das ist reiner für sie.', note:'Das Senken des Blicks ist eine Übung, keine Prüfung, die man einmal besteht. Jedes Wegsehen zählt.'},
+  {title:'Ersetzen statt nur verbieten', de:'Das Gehirn sucht Entlastung. Was gibt dir sonst Ruhe, Nähe oder Freude? Sport, ein Gespräch, frische Luft, Gebet. Plane diese Dinge bewusst in deine Woche ein.'},
+  {ref:'Sure 3:135 (Al ‘Imran)', de:'Und diejenigen, die, wenn sie etwas Schändliches begangen oder sich selbst Unrecht zugefügt haben, Allahs gedenken und um Vergebung für ihre Sünden bitten – und wer vergibt die Sünden außer Allah? – und nicht wissentlich auf dem beharren, was sie getan haben.', note:'Die Gläubigen werden hier nicht als Menschen beschrieben, die nie fallen, sondern als Menschen, die zurückkehren.'},
+  {ref:'Hadith, überliefert bei at-Tirmidhi', de:'Alle Kinder Adams begehen Fehler, und die besten unter denen, die Fehler begehen, sind diejenigen, die bereuen.', note:'Fehler gehören zum Menschsein. Entscheidend ist die Rückkehr.'},
+  {ref:'Hadith Qudsi, überliefert bei al-Bukhari', de:'Wenn sich Mein Diener Mir eine Handspanne nähert, nähere Ich Mich ihm eine Elle … Und wenn er gehend zu Mir kommt, komme Ich eilend zu ihm.', note:'Du musst den Weg nicht perfekt gehen. Der erste kleine Schritt genügt.'},
+  {ref:'Hadith, überliefert bei al-Bukhari und Muslim', de:'O ihr jungen Leute, wer von euch heiraten kann, der soll heiraten … und wer es nicht kann, der soll fasten, denn das Fasten ist für ihn ein Schutz.', note:'Freiwilliges Fasten, etwa montags und donnerstags, hat der Prophet ﷺ für genau diesen Kampf empfohlen.'}
+];
+const DUA_ZUFLUCHT = {ar:'أَعُوذُ بِاللَّهِ مِنَ الشَّيْطَانِ الرَّجِيمِ', tr:'A‘ūdhu billāhi mina sch-schaiṭāni r-radschīm', de:'Ich suche Zuflucht bei Allah vor dem verfluchten Satan.'};
+const DUA_AFAF = {ar:'اللَّهُمَّ إِنِّي أَسْأَلُكَ الْهُدَى وَالتُّقَى وَالْعَفَافَ وَالْغِنَى', tr:'Allāhumma innī as’aluka l-hudā wa-t-tuqā wa-l-‘afāfa wa-l-ghinā', de:'O Allah, ich bitte Dich um Rechtleitung, Gottesfurcht, Keuschheit und Genügsamkeit.', src:'Überliefert bei Muslim'};
+const HALT = ['Hungrig','Wütend','Einsam','Müde'];
+const MOODS = ['Schwer','Gedrückt','Okay','Gut','Sehr gut'];
+const TRIGGERS = ['Allein zu Hause','Spät abends','Handy im Bett','Social Media','Stress','Langeweile','Müdigkeit','Streit oder Ärger','Traurigkeit','Sonstiges'];
+const WHEN = ['Morgens','Mittags','Nachmittags','Abends','Spät abends','Nachts'];
+const ENV = [
+  ['filterPhone','Inhaltsfilter auf dem Handy eingerichtet'],
+  ['filterPc','Inhaltsfilter auf Laptop oder PC eingerichtet'],
+  ['phoneOut','Handy schläft nachts außerhalb des Schlafzimmers'],
+  ['bedtime','Feste Schlafenszeit'],
+  ['feeds','Social-Media-Feeds bereinigt, auslösende Apps gelöscht'],
+  ['openRooms','Geräte nur in offenen Räumen nutzen'],
+  ['salah','Gebetszeiten als feste Anker im Tag'],
+  ['fasting','Freiwilliges Fasten eingeplant (z. B. Mo und Do)']
+];
+
+/* ---------- Speicher ---------- */
+const KEY = 'kompass:v1';
+const fresh = () => ({checkins:{}, sos:[], relapses:[], plan:{why:[], contacts:[], env:{}, goals:[], lessons:[]}, settings:{theme:'system'}});
+let storageOk = true;
+function load(){
+  try{
+    localStorage.setItem(KEY+':test','1'); localStorage.removeItem(KEY+':test');
+    const raw = localStorage.getItem(KEY);
+    return raw ? merge(JSON.parse(raw)) : fresh();
+  }catch(e){ storageOk = false; return fresh(); }
+}
+function merge(d){
+  const b = fresh();
+  return {checkins:d.checkins||{}, sos:d.sos||[], relapses:d.relapses||[], plan:{...b.plan, ...(d.plan||{})}, settings:{...b.settings, ...(d.settings||{})}};
+}
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(S)); }
+  catch(e){ storageOk = false; toast('Speichern ist in diesem Browser gerade nicht möglich.'); }
+}
+let S = load();
+
+/* ---------- Hilfsfunktionen ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const pad = n => String(n).padStart(2,'0');
+const dk = (d = new Date()) => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const dayLabel = k => { const [y,m,d] = k.split('-').map(Number); return new Date(y,m-1,d).toLocaleDateString('de-DE',{weekday:'long', day:'numeric', month:'long'}); };
+const shortDate = ts => new Date(ts).toLocaleDateString('de-DE',{day:'numeric', month:'short'});
+function star(cx, cy, R){
+  const r = R * 0.7654, p = [];
+  for(let i = 0; i < 16; i++){
+    const a = (-90 + i * 22.5) * Math.PI / 180, rad = i % 2 ? r : R;
+    p.push((cx + rad*Math.cos(a)).toFixed(2) + ',' + (cy + rad*Math.sin(a)).toFixed(2));
+  }
+  return p.join(' ');
+}
+function whenOf(ts){
+  const h = new Date(ts).getHours();
+  return h < 5 ? 'Nachts' : h < 10 ? 'Morgens' : h < 14 ? 'Mittags' : h < 18 ? 'Nachmittags' : h < 21 ? 'Abends' : 'Spät abends';
+}
+function todayImpulse(){
+  const n = new Date(), start = new Date(n.getFullYear(),0,0);
+  return IMPULSE[Math.floor((n - start) / 864e5) % IMPULSE.length];
+}
+let toastT;
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.hidden = false;
+  clearTimeout(toastT); toastT = setTimeout(() => t.hidden = true, 3200);
+}
+function applyTheme(){
+  const t = S.settings.theme;
+  if(t === 'system') document.documentElement.removeAttribute('data-theme');
+  else document.documentElement.setAttribute('data-theme', t);
+}
+const chip = (field, val, on, single) => `<button class="chip" data-action="${single?'pick':'toggle'}" data-field="${field}" data-val="${esc(val)}" aria-pressed="${on}">${esc(val)}</button>`;
+const checkSvg = '<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M3 8.5l3.2 3L13 4.5"/></svg>';
+
+function impulseBlock(i){
+  return `<article class="impulse">
+    ${i.title ? `<h3>${esc(i.title)}</h3>` : ''}
+    ${i.ar ? `<p class="ar" lang="ar">${i.ar}</p>` : ''}
+    <p class="${i.title ? 'body' : 'verse'}">${esc(i.de)}</p>
+    ${i.note ? `<p class="note">${esc(i.note)}</p>` : ''}
+    ${i.ref ? `<p class="src">${esc(i.ref)}</p>` : ''}
+  </article>`;
+}
+function duaBlock(d){
+  return `<div class="dua"><p class="ar" lang="ar">${d.ar}</p><p class="tr">${esc(d.tr)}</p><p style="margin:0">${esc(d.de)}</p>${d.src ? `<p class="src" style="margin-top:8px">${esc(d.src)}</p>` : ''}</div>`;
+}
+
+/* ---------- Ansichten ---------- */
+let view = 'heute';
+
+function vHeute(){
+  const h = new Date().getHours();
+  const greet = h < 5 ? 'Hallo' : h < 11 ? 'Guten Morgen' : h < 18 ? 'Guten Tag' : 'Guten Abend';
+  const late = h >= 21 || h < 5;
+  const ci = S.checkins[dk()];
+  const week = S.sos.filter(s => s.outcome === 'ok' && Date.now() - s.ts < 7*864e5).length;
+  return `
+    <p class="date">${dayLabel(dk())}</p>
+    <h1>${greet}.</h1>
+    <p class="lead">${late ? 'Späte Stunden sind oft die schwierigsten. Wenn ein Drang kommt, tipp auf den Stern.' : 'Wenn ein Drang kommt, tipp auf den Stern. Er begleitet dich durch die nächsten 15 Minuten.'}</p>
+    <button class="sos" data-action="startSos" aria-label="Notfall-Begleitung starten">
+      <svg viewBox="0 0 300 300" aria-hidden="true">
+        <polygon class="star" points="${star(150,150,146)}"/>
+        <polygon class="star-inner" points="${star(150,150,116)}"/>
+        <text class="sos-t" x="150" y="143" text-anchor="middle">Ich habe</text>
+        <text class="sos-t" x="150" y="175" text-anchor="middle">einen Drang</text>
+      </svg>
+    </button>
+    <div class="stack">
+      <button class="btn ${ci ? 'secondary' : 'primary'}" data-action="openCheckin">${ci ? 'Check-in von heute ansehen' : 'Check-in machen'}</button>
+      <button class="btn quiet" data-action="openRelapse">Ich hatte einen Rückfall</button>
+    </div>
+    ${week ? `<p class="hint" style="text-align:center;margin-top:6px">Diese Woche hast du ${week} ${week === 1 ? 'Drang' : 'Dränge'} überstanden.</p>` : ''}
+    <h2>Impuls für heute</h2>
+    ${impulseBlock(todayImpulse())}
+    ${storageOk ? '' : '<p class="warn">Dieser Browser erlaubt kein Speichern. Deine Einträge gehen beim Schließen verloren. Öffne die Seite am besten in einem normalen (nicht privaten) Browserfenster.</p>'}
+  `;
+}
+
+function relapseDaySet(){
+  const s = new Set(S.relapses.map(r => r.date));
+  Object.entries(S.checkins).forEach(([k, v]) => { if(v.relapse) s.add(k); });
+  return s;
+}
+function avgUrge(fromDaysAgo, toDaysAgo){
+  const vals = [];
+  for(let i = fromDaysAgo; i > toDaysAgo; i--){
+    const d = new Date(); d.setDate(d.getDate() - i + 1);
+    const c = S.checkins[dk(d)];
+    if(c && typeof c.urge === 'number') vals.push(c.urge);
+  }
+  return vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(1).replace('.', ',') : null;
+}
+function hbars(rows, cls = ''){
+  const max = Math.max(1, ...rows.map(r => r[1]));
+  return `<div class="hbars">${rows.map(([l, n]) => `<div class="hbar ${cls}"><span>${esc(l)}</span><div class="track"><div class="fill" style="width:${(n/max*100).toFixed(0)}%"></div></div><span class="n">${n}</span></div>`).join('')}</div>`;
+}
+
+function vMuster(){
+  const hasData = Object.keys(S.checkins).length || S.sos.length || S.relapses.length;
+  if(!hasData) return `<h1 style="margin-top:22px">Deine Muster</h1>
+    <div class="empty">Noch keine Einträge. Mach heute deinen ersten Check-in. Nach ein paar Tagen erscheinen hier deine Muster: wann Dränge kommen, was sie auslöst und wie sich alles entwickelt.</div>`;
+
+  const now = Date.now(), rel = relapseDaySet();
+  const sos30 = S.sos.filter(s => now - s.ts < 30*864e5);
+  const ok30 = sos30.filter(s => s.outcome === 'ok').length;
+  const thisM = dk().slice(0,7);
+  const pm = new Date(); pm.setDate(1); pm.setMonth(pm.getMonth() - 1);
+  const prevM = dk(pm).slice(0,7);
+  const relThis = [...rel].filter(d => d.startsWith(thisM)).length;
+  const relPrev = [...rel].filter(d => d.startsWith(prevM)).length;
+  const a1 = avgUrge(7, 0), a2 = avgUrge(14, 7);
+
+  let facts = `<p>In den letzten 30 Tagen hast du <b>${ok30}</b> ${ok30 === 1 ? 'Drang' : 'Dränge'} mit dem Notfall-Modus überstanden${sos30.length > ok30 ? ` (bei ${sos30.length} Starts)` : ''}.</p>`;
+  facts += `<p>Diesen Monat gab es an <b>${relThis}</b> ${relThis === 1 ? 'Tag' : 'Tagen'} einen Rückfall, im Vormonat an <b>${relPrev}</b>.${relPrev > relThis && new Date().getDate() > 20 ? ' Das ist weniger als zuvor.' : ''}</p>`;
+  if(a1) facts += `<p>Dein Drang lag diese Woche im Schnitt bei <b>${a1}</b> von 10${a2 ? `, in der Woche davor bei <b>${a2}</b>` : ''}.</p>`;
+
+  // 30-Tage-Diagramm
+  let bars = '';
+  for(let i = 0; i < 30; i++){
+    const d = new Date(); d.setDate(d.getDate() - 29 + i);
+    const k = dk(d), c = S.checkins[k], x = i*10 + 2;
+    if(c && typeof c.urge === 'number'){
+      const h = Math.max(2, c.urge * 10);
+      bars += `<rect class="bar${rel.has(k) ? ' rel' : ''}" x="${x}" y="${110 - h}" width="6" height="${h}" rx="1.5"/>`;
+    } else if(rel.has(k)){
+      bars += `<rect class="bar rel" x="${x}" y="104" width="6" height="6" rx="1.5"/>`;
+    } else {
+      bars += `<rect class="tick" x="${x}" y="108" width="6" height="2"/>`;
+    }
+  }
+  const d0 = new Date(); d0.setDate(d0.getDate() - 29);
+  const chart = `<div class="chart"><svg viewBox="0 0 300 126" role="img" aria-label="Drang-Stärke der letzten 30 Tage">${bars}
+    <text class="axis" x="2" y="123">${shortDate(d0)}</text><text class="axis" x="298" y="123" text-anchor="end">heute</text></svg></div>
+    <div class="legend"><span><i style="background:var(--accent)"></i>Drang-Stärke (0 bis 10)</span><span><i style="background:var(--dawn)"></i>Tag mit Rückfall</span></div>`;
+
+  // Tageszeit
+  const tc = Object.fromEntries(WHEN.map(w => [w, 0]));
+  S.sos.forEach(s => tc[whenOf(s.ts)]++);
+  S.relapses.forEach(r => { if(r.when) tc[r.when]++; });
+  const tTotal = Object.values(tc).reduce((a,b) => a+b, 0);
+
+  // Auslöser
+  const trg = {};
+  Object.values(S.checkins).forEach(c => (c.triggers || []).forEach(t => trg[t] = (trg[t] || 0) + 1));
+  S.relapses.forEach(r => (r.triggers || []).forEach(t => trg[t] = (trg[t] || 0) + 1));
+  const topT = Object.entries(trg).sort((a,b) => b[1] - a[1]).slice(0, 5);
+
+  // HALT
+  const hc = Object.fromEntries(HALT.map(h => [h, 0]));
+  Object.values(S.checkins).forEach(c => (c.halt || []).forEach(h => hc[h]++));
+  const hTotal = Object.values(hc).reduce((a,b) => a+b, 0);
+
+  // Monate
+  const months = [];
+  for(let i = 5; i >= 0; i--){
+    const m = new Date(); m.setDate(1); m.setMonth(m.getMonth() - i);
+    const key = dk(m).slice(0,7);
+    months.push([m.toLocaleDateString('de-DE',{month:'long'}), [...rel].filter(d => d.startsWith(key)).length]);
+  }
+
+  return `<h1 style="margin-top:22px">Deine Muster</h1>
+    <p class="lead">Kein Zähler, der auf null springt. Hier zählt die Richtung.</p>
+    <div class="facts">${facts}</div>
+    <h2>Die letzten 30 Tage</h2>${chart}
+    <h2>Wann es schwierig wird</h2>
+    ${tTotal ? `<p class="hint">Aus Notfall-Starts und Rückfällen.</p>${hbars(Object.entries(tc))}` : '<p class="hint">Erscheint, sobald du den Notfall-Modus genutzt oder einen Rückfall festgehalten hast.</p>'}
+    <h2>Häufigste Auslöser</h2>
+    ${topT.length ? hbars(topT) : '<p class="hint">Erscheint, sobald du in Check-ins Auslöser auswählst.</p>'}
+    <h2>HALT im Überblick</h2>
+    ${hTotal ? hbars(Object.entries(hc)) : '<p class="hint">Erscheint, sobald du im Check-in markierst, ob du hungrig, wütend, einsam oder müde warst.</p>'}
+    <h2>Tage mit Rückfall pro Monat</h2>
+    ${hbars(months, 'dawn')}
+  `;
+}
+
+function vPlan(){
+  const P = S.plan;
+  const envDone = ENV.filter(([k]) => P.env[k]).length;
+  const th = S.settings.theme;
+  return `<h1 style="margin-top:22px">Mein Plan</h1>
+    <p class="lead">Alles, was dich im entscheidenden Moment stützt.</p>
+
+    <h2>Mein Warum</h2>
+    <p class="hint">Deine Gründe, in deinen eigenen Worten. Sie erscheinen im Notfall-Modus.</p>
+    ${P.why.length ? `<ul class="list">${P.why.map((w,i) => `<li><span>${esc(w)}</span><button class="del" data-action="del" data-list="why" data-i="${i}" aria-label="Entfernen">×</button></li>`).join('')}</ul>` : ''}
+    <div class="add"><input type="text" id="whyIn" placeholder="Zum Beispiel: Ich will mit klarem Herzen beten." data-enter="addWhy"><button class="btn small primary" data-action="addWhy">Hinzufügen</button></div>
+
+    <h2>Menschen, die ich anrufen kann</h2>
+    <p class="hint">Erscheinen im Notfall-Modus mit Anruf-Knopf.</p>
+    ${P.contacts.length ? `<ul class="list">${P.contacts.map((c,i) => `<li><span>${esc(c.name)}<small>${esc(c.tel)}</small></span><button class="del" data-action="del" data-list="contacts" data-i="${i}" aria-label="Entfernen">×</button></li>`).join('')}</ul>` : ''}
+    <div class="add"><input type="text" id="cName" placeholder="Name"><input type="tel" id="cTel" placeholder="Telefonnummer" data-enter="addContact"><button class="btn small primary" data-action="addContact">Hinzufügen</button></div>
+
+    <h2>Ziele für diese Woche</h2>
+    <p class="hint">Ein bis zwei kleine, konkrete Schritte reichen.</p>
+    ${P.goals.length ? `<ul class="list">${P.goals.map((g,i) => `<li><button class="check" data-action="toggleGoal" data-i="${i}" aria-pressed="${!!g.done}" aria-label="Erledigt">${checkSvg}</button><span class="${g.done ? 'done-text' : ''}">${esc(g.text)}</span><button class="del" data-action="del" data-list="goals" data-i="${i}" aria-label="Entfernen">×</button></li>`).join('')}</ul>` : ''}
+    <div class="add"><input type="text" id="goalIn" placeholder="Zum Beispiel: Fajr in der Moschee beten" data-enter="addGoal"><button class="btn small primary" data-action="addGoal">Hinzufügen</button></div>
+    ${P.goals.some(g => g.done) ? '<button class="btn quiet" data-action="clearGoals" style="width:auto;padding-left:0">Erledigte entfernen</button>' : ''}
+
+    <h2>Meine Umgebung</h2>
+    <p class="hint">${envDone} von ${ENV.length} eingerichtet. Jeder Punkt nimmt dir Arbeit für die schwachen Momente ab.</p>
+    <ul class="list">${ENV.map(([k,l]) => `<li><button class="check" data-action="toggleEnv" data-k="${k}" aria-pressed="${!!P.env[k]}" aria-label="${esc(l)}">${checkSvg}</button><span>${esc(l)}</span></li>`).join('')}</ul>
+
+    <h2>Meine Erkenntnisse</h2>
+    <p class="hint">Was du nach Rückfällen ändern wolltest. So wird aus jedem Fall ein Baustein.</p>
+    ${P.lessons.length ? `<ul class="list">${P.lessons.map((l,i) => `<li><span>${esc(l.text)}<small>${shortDate(l.ts)}</small></span><button class="del" data-action="del" data-list="lessons" data-i="${i}" aria-label="Entfernen">×</button></li>`).join('')}</ul>` : '<p class="hint">Noch keine Einträge.</p>'}
+
+    <h2>Professionelle Hilfe</h2>
+    <div class="help">
+      <p>Nach mehreren Jahren ist eine Therapie kein Zeichen von Schwäche, sondern das passende Werkzeug. Gute Ansätze sind Verhaltenstherapie und ACT (Akzeptanz- und Commitment-Therapie). Viele Therapeutinnen und Therapeuten haben Erfahrung mit zwanghaftem Sexualverhalten.</p>
+      <p>Einen Termin für eine psychotherapeutische Sprechstunde vermittelt die Terminservicestelle unter <a href="tel:116117">116 117</a>. Wenn du einfach reden musst, ist die TelefonSeelsorge rund um die Uhr erreichbar: <a href="tel:08001110111">0800 111 0 111</a>. Auch ein Imam deines Vertrauens kann eine wertvolle Begleitung sein.</p>
+    </div>
+
+    <h2>Darstellung</h2>
+    <div class="chips">
+      <button class="chip" data-action="theme" data-val="system" aria-pressed="${th === 'system'}">Wie das Gerät</button>
+      <button class="chip" data-action="theme" data-val="light" aria-pressed="${th === 'light'}">Hell</button>
+      <button class="chip" data-action="theme" data-val="dark" aria-pressed="${th === 'dark'}">Dunkel</button>
+    </div>
+
+    <h2>Deine Daten</h2>
+    <p class="hint">Alles bleibt nur in diesem Browser auf diesem Gerät. Niemand sonst kann es sehen, auch nicht die Person, die dir diesen Link geschickt hat. Wenn du den Browser-Verlauf löschst, sind die Daten weg, daher lohnt sich ab und zu eine Sicherung.</p>
+    <div class="row"><button class="btn secondary" data-action="showBackup">Sicherung erstellen</button><button class="btn secondary" data-action="showRestore">Wiederherstellen</button></div>
+    <div id="dataBox"></div>
+    <button class="btn quiet" data-action="wipe" id="wipeBtn" style="margin-top:10px">Alle Daten löschen</button>
+  `;
+}
+
+function vImpulse(){
+  const t = todayImpulse();
+  return `<h1 style="margin-top:22px">Impulse</h1>
+    <p class="lead">Jeden Tag ein neuer Gedanke. Hier findest du alle auf einen Blick.</p>
+    <h2>Heute</h2>${impulseBlock(t)}
+    <h2>Alle Impulse</h2>${IMPULSE.filter(i => i !== t).map(impulseBlock).join('')}`;
+}
+
+const VIEWS = {heute:vHeute, muster:vMuster, plan:vPlan, impulse:vImpulse};
+function render(){
+  $('#main').innerHTML = VIEWS[view]();
+  document.querySelectorAll('nav.tabs button').forEach(b => { if(b.dataset.view === view) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
+}
+
+/* ---------- Overlays ---------- */
+let O = null;
+const SOS_MS = 15 * 60 * 1000;
+const SOS_STEPS = 8;
+let breathT;
+
+function openOverlay(o){ O = o; renderOverlay(); $('#overlay').scrollTop = 0; }
+function closeOverlay(){ O = null; clearTimeout(breathT); renderOverlay(); render(); }
+
+function renderOverlay(){
+  const el = $('#overlay');
+  clearTimeout(breathT);
+  if(!O){ el.hidden = true; el.innerHTML = ''; document.body.classList.remove('locked'); return; }
+  el.hidden = false; document.body.classList.add('locked');
+  el.innerHTML = `<div class="ov">${O.type === 'sos' ? ovSos() : O.type === 'checkin' ? ovCheckin() : ovRelapse()}</div>`;
+  el.scrollTop = 0;
+  if(O.type === 'sos'){ tick(); if(O.step === 2) startBreath(); }
+  const f = el.querySelector('h2'); if(f){ f.setAttribute('tabindex','-1'); f.focus({preventScroll:true}); }
+}
+
+function ovSos(){
+  const s = O.step;
+  const head = `<div class="ov-head">
+    <div class="timer" aria-live="off"><svg viewBox="0 0 100 100" aria-hidden="true"><circle class="trk" cx="50" cy="50" r="42"/><circle class="prg" id="ring" cx="50" cy="50" r="42" stroke-dasharray="263.9" stroke-dashoffset="263.9"/><polygon class="mini" points="${star(50,50,20)}"/></svg>
+    <div><span id="sosTime">15:00</span><small id="sosSub">bis die Welle abflacht</small></div></div>
+    ${s < SOS_STEPS ? '<button class="close" data-action="sosEnd">Beenden</button>' : ''}
+  </div>`;
+  const nav = `<div class="ov-foot"><button class="btn accent" data-action="sosNext">${s === SOS_STEPS - 1 ? 'Weiter zum Abschluss' : 'Weiter'}</button>${s > 0 ? '<button class="btn quiet" data-action="sosBack">Zurück</button>' : ''}</div>`;
+  const n = `<p class="step-n">Schritt ${s+1} von ${SOS_STEPS}</p>`;
+  const P = S.plan;
+  let body = '';
+  switch(s){
+    case 0: body = `${n}<h2>Steh auf und wechsle den Raum.</h2>
+      <p>Bewegung unterbricht den Automatismus. Mach Licht an, lass die Tür offen und geh dorthin, wo andere sind oder sein könnten.</p>
+      <p class="note">Nimm das Handy nur für diese Begleitung mit und schau nirgendwo anders hin.</p>`; break;
+    case 1: body = `${n}<h2>Sprich die Zuflucht.</h2>${duaBlock(DUA_ZUFLUCHT)}<p>Sprich sie leise oder laut, gern mehrmals.</p>`; break;
+    case 2: body = `${n}<h2>Atme mit dem Stern.</h2>
+      <div class="breath"><svg viewBox="0 0 200 200" aria-hidden="true"><polygon class="star" points="${star(100,100,96)}"/></svg></div>
+      <p class="breath-l" id="breathL" aria-live="polite">Einatmen</p>
+      <p>Vier Sekunden ein, sechs Sekunden aus. Langes Ausatmen beruhigt das Nervensystem. Bleib etwa eine Minute dabei.</p>`; break;
+    case 3: body = `${n}<h2>Mach Wudu.</h2>
+      <p>Die Waschung unterbricht dich körperlich und richtet dich neu aus. Nimm dir Zeit, Schritt für Schritt, ganz bewusst.</p>
+      <p>Wenn du magst, bete danach zwei Rak‘a. Du kannst diese Seite offen lassen, der Timer läuft weiter.</p>`; break;
+    case 4: body = `${n}<h2>Erinnere dich, warum.</h2>
+      ${P.why.length ? `<ul class="list">${P.why.map(w => `<li><span style="font-size:1.1rem">${esc(w)}</span></li>`).join('')}</ul>` :
+      '<p>Was ist dir wichtiger als dieser eine Moment? Denk ein paar Atemzüge lang daran.</p><p class="note">Trag deine Gründe später unter „Plan“ ein. Dann stehen sie hier.</p>'}`; break;
+    case 5: body = `${n}<h2>Bitte um Hilfe.</h2>${duaBlock(DUA_AFAF)}
+      <p>Diese Dua hat der Prophet ﷺ selbst gesprochen. Al-‘afāf bedeutet Keuschheit und Selbstbeherrschung, genau das, worum es gerade geht.</p>`; break;
+    case 6: body = `${n}<h2>Beobachte die Welle.</h2>
+      <p>Du musst jetzt nichts tun. Wo im Körper spürst du den Drang? Beobachte ihn wie eine Welle, die steigt, ihren Gipfel erreicht und wieder sinkt.</p>
+      <p>Er ist unangenehm, aber er kann dich zu nichts zwingen.</p>
+      <label class="q" for="urgeNow">Wie stark ist der Drang gerade?</label>
+      <div class="range"><input type="range" id="urgeNow" min="0" max="10" value="${O.urgeNow ?? 5}" data-bind="urgeNow"><output id="urgeNowOut">${O.urgeNow ?? 5}</output></div>
+      <div class="scale"><span>kaum</span><span>sehr stark</span></div>`; break;
+    case 7: body = `${n}<h2>Sprich mit jemandem.</h2>
+      <p>Du musst nicht erzählen, worum es geht. Schon ein kurzes Gespräch unterbricht den Moment.</p>
+      ${P.contacts.length ? `<div class="stack">${P.contacts.map(c => `<a class="btn secondary contact" href="tel:${esc(c.tel.replace(/[^\d+]/g,''))}"><span>${esc(c.name)}</span><span>Anrufen</span></a>`).join('')}</div>` :
+      '<p class="note">Trag unter „Plan“ eine Person ein, die du in solchen Momenten anrufen kannst.</p>'}`; break;
+    default: return head + `<h2 style="margin-top:22px">Wie geht es dir jetzt?</h2>
+      <p>Egal wie es ausgegangen ist: Dass du den Stern gedrückt hast, war bereits eine gute Entscheidung.</p>
+      <div class="ov-foot">
+        <button class="btn accent" data-action="sosOutcome" data-val="ok">Der Drang ist vorbei</button>
+        <button class="btn secondary" data-action="sosOutcome" data-val="more">Ich brauche noch etwas Zeit</button>
+        <button class="btn secondary" data-action="sosOutcome" data-val="relapse">Ich hatte einen Rückfall</button>
+        <button class="btn quiet" data-action="sosOutcome" data-val="discard">Schließen, ohne zu speichern</button>
+      </div>`;
+  }
+  return head + body + nav;
+}
+
+function tick(){
+  if(!O || O.type !== 'sos') return;
+  const left = Math.max(0, SOS_MS - (Date.now() - O.start));
+  const t = $('#sosTime'), r = $('#ring'), sub = $('#sosSub');
+  if(!t) return;
+  if(left === 0){ t.textContent = '15 Minuten'; sub.textContent = 'geschafft'; r.setAttribute('stroke-dashoffset', 0); return; }
+  const sec = Math.ceil(left / 1000);
+  t.textContent = `${Math.floor(sec/60)}:${pad(sec % 60)}`;
+  r.setAttribute('stroke-dashoffset', (263.9 * left / SOS_MS).toFixed(1));
+}
+setInterval(tick, 1000);
+
+function startBreath(){
+  let inhale = true;
+  const step = () => {
+    const l = $('#breathL'); if(!l || !O || O.step !== 2) return;
+    l.textContent = inhale ? 'Einatmen' : 'Ausatmen';
+    breathT = setTimeout(() => { inhale = !inhale; step(); }, inhale ? 4000 : 6000);
+  };
+  step();
+}
+
+function ovCheckin(){
+  const d = O.data;
+  return `<div class="ov-head"><span class="hint" style="margin:0">${dayLabel(O.date)}</span><button class="close" data-action="close">Abbrechen</button></div>
+    <h2 style="margin-top:14px">Check-in</h2>
+    <p class="hint">Eine Minute. Ehrlich ist wichtiger als gut.</p>
+    <label class="q">Wie geht es dir heute?</label>
+    <div class="chips">${MOODS.map(m => chip('mood', m, d.mood === m, true)).join('')}</div>
+    <label class="q">Was trifft gerade zu?</label>
+    <div class="chips">${HALT.map(h => chip('halt', h, d.halt.includes(h))).join('')}</div>
+    <label class="q" for="urge">Wie stark war der Drang heute?</label>
+    <div class="range"><input type="range" id="urge" min="0" max="10" value="${d.urge}" data-bind="urge"><output id="urgeOut">${d.urge}</output></div>
+    <div class="scale"><span>gar nicht</span><span>sehr stark</span></div>
+    <label class="q">Was hat ihn ausgelöst?</label>
+    <div class="chips">${TRIGGERS.map(t => chip('triggers', t, d.triggers.includes(t))).join('')}</div>
+    <label class="q">Gab es heute einen Rückfall?</label>
+    <div class="seg">${chip('relapse', 'Nein', d.relapse === false, true)}${chip('relapse', 'Ja', d.relapse === true, true)}</div>
+    <label class="q" for="note">Notiz <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
+    <textarea id="note" data-bind="note" placeholder="Was war heute los?">${esc(d.note)}</textarea>
+    <div class="ov-foot"><button class="btn primary" data-action="saveCheckin">Check-in speichern</button></div>`;
+}
+
+function ovRelapse(){
+  const s = O.step, d = O.data;
+  const head = `<div class="ov-head"><span></span>${s < 3 ? '<button class="close" data-action="close">Schließen</button>' : ''}</div>`;
+  if(s === 0) return head + `<h2 style="margin-top:14px">Atme kurz durch.</h2>
+    ${impulseBlock(IMPULSE[0])}
+    <p>Ein Rückfall löscht nicht, was du aufgebaut hast. Jeder Drang, den du überstanden hast, zählt weiter.</p>
+    <p>Lass uns kurz anschauen, was passiert ist, damit dein Plan stärker wird.</p>
+    <div class="ov-foot"><button class="btn accent" data-action="relNext">Weiter</button></div>`;
+  if(s === 1) return head + `<h2 style="margin-top:14px">Der Weg zurück ist offen.</h2>
+    <p>Tawbah bedeutet: aufhören, bereuen und sich vornehmen, es nicht wieder zu tun. Sie steht dir offen, auch nach dem hundertsten Mal.</p>
+    ${impulseBlock(IMPULSE[13])}
+    <p>Reue richtet sich auf die Tat. Scham richtet sich gegen dich als Person, und sie ist einer der stärksten Auslöser für den nächsten Rückfall. Du darfst die Tat bereuen, ohne dich selbst zu verachten.</p>
+    <div class="ov-foot"><button class="btn accent" data-action="relNext">Weiter</button><button class="btn quiet" data-action="relBack">Zurück</button></div>`;
+  if(s === 2) return head + `<h2 style="margin-top:14px">Was ist passiert?</h2>
+    <p class="hint">Kurze Stichworte reichen. Es geht ums Lernen, nicht ums Urteilen.</p>
+    <label class="q">Wann war es ungefähr?</label>
+    <div class="chips">${WHEN.map(w => chip('when', w, d.when === w, true)).join('')}</div>
+    <label class="q">Was war vorher los?</label>
+    <div class="chips" style="margin-bottom:10px">${TRIGGERS.map(t => chip('triggers', t, d.triggers.includes(t))).join('')}</div>
+    <textarea data-bind="before" placeholder="Zum Beispiel: Streit mit meinem Bruder, danach allein im Zimmer am Handy.">${esc(d.before)}</textarea>
+    <label class="q" for="helped">Was hätte dir geholfen?</label>
+    <textarea id="helped" data-bind="helped" placeholder="Zum Beispiel: früher jemanden anrufen, das Handy aus dem Zimmer bringen.">${esc(d.helped)}</textarea>
+    <label class="q" for="change">Was änderst du konkret für das nächste Mal?</label>
+    <textarea id="change" data-bind="change" placeholder="Zum Beispiel: Ab 22 Uhr liegt das Handy in der Küche.">${esc(d.change)}</textarea>
+    <div class="ov-foot"><button class="btn primary" data-action="saveRelapse">Speichern</button><button class="btn quiet" data-action="relBack">Zurück</button></div>`;
+  return head + `<h2 style="margin-top:14px">Gespeichert.</h2>
+    <p>${d.change.trim() ? 'Deine Änderung steht jetzt in deinem Plan unter „Meine Erkenntnisse“.' : 'Dein Eintrag fließt in deine Muster ein.'}</p>
+    <p>Mach heute noch etwas Gutes für dich: ein Gebet, ein Gespräch, frische Luft. Morgen ist ein neuer Tag, und du startest nicht bei null.</p>
+    <div class="ov-foot"><button class="btn primary" data-action="close">Fertig</button></div>`;
+}
+
+/* ---------- Aktionen ---------- */
+const A = {
+  nav: b => { view = b.dataset.view; render(); window.scrollTo(0,0); },
+  startSos: () => openOverlay({type:'sos', start:Date.now(), step:0, urgeNow:null}),
+  sosNext: () => { O.step = Math.min(SOS_STEPS, O.step + 1); renderOverlay(); },
+  sosBack: () => { O.step = Math.max(0, O.step - 1); renderOverlay(); },
+  sosEnd: () => { O.step = SOS_STEPS; renderOverlay(); },
+  sosOutcome: b => {
+    const v = b.dataset.val;
+    if(v === 'more'){ O.step = 6; renderOverlay(); return; }
+    if(v === 'discard'){ closeOverlay(); return; }
+    S.sos.push({ts:O.start, end:Date.now(), outcome:v, urgeEnd:O.urgeNow});
+    save();
+    if(v === 'ok'){ closeOverlay(); toast('Gespeichert. Ein überstandener Drang mehr.'); }
+    else openOverlay({type:'relapse', step:0, date:dk(), data:{when:whenOf(O.start), triggers:[], before:'', helped:'', change:''}});
+  },
+  openCheckin: () => {
+    const k = dk(), c = S.checkins[k];
+    openOverlay({type:'checkin', date:k, data: c ? JSON.parse(JSON.stringify(c)) : {mood:null, halt:[], urge:0, triggers:[], relapse:null, note:''}});
+  },
+  saveCheckin: () => {
+    const d = O.data;
+    S.checkins[O.date] = {...d, ts:Date.now()};
+    save();
+    const hasRel = S.relapses.some(r => r.date === O.date);
+    if(d.relapse === true && !hasRel){
+      openOverlay({type:'relapse', step:0, date:O.date, data:{when:null, triggers:[...d.triggers], before:d.note || '', helped:'', change:''}});
+      toast('Check-in gespeichert.');
+    } else { closeOverlay(); toast('Check-in gespeichert.'); }
+  },
+  openRelapse: () => openOverlay({type:'relapse', step:0, date:dk(), data:{when:null, triggers:[], before:'', helped:'', change:''}}),
+  relNext: () => { O.step++; renderOverlay(); },
+  relBack: () => { O.step--; renderOverlay(); },
+  saveRelapse: () => {
+    const d = O.data, ts = Date.now();
+    S.relapses.push({ts, date:O.date, ...d});
+    if(d.change.trim()) S.plan.lessons.unshift({text:d.change.trim(), ts});
+    save(); O.step = 3; renderOverlay();
+  },
+  close: () => closeOverlay(),
+  toggle: b => {
+    const arr = O.data[b.dataset.field], v = b.dataset.val, i = arr.indexOf(v);
+    i >= 0 ? arr.splice(i,1) : arr.push(v);
+    b.setAttribute('aria-pressed', i < 0);
+  },
+  pick: b => {
+    const f = b.dataset.field;
+    let v = b.dataset.val;
+    if(f === 'relapse') v = v === 'Ja';
+    O.data[f] = O.data[f] === v ? null : v;
+    b.parentElement.querySelectorAll('.chip').forEach(c => {
+      const cv = f === 'relapse' ? c.dataset.val === 'Ja' : c.dataset.val;
+      c.setAttribute('aria-pressed', O.data[f] === cv);
+    });
+  },
+  addWhy: () => addTo('why', '#whyIn'),
+  addGoal: () => { const el = $('#goalIn'), v = el.value.trim(); if(!v) return; S.plan.goals.push({text:v, done:false}); save(); render(); $('#goalIn').focus(); },
+  addContact: () => {
+    const n = $('#cName').value.trim(), t = $('#cTel').value.trim();
+    if(!n || !t){ toast('Bitte Name und Telefonnummer eintragen.'); return; }
+    S.plan.contacts.push({name:n, tel:t}); save(); render();
+  },
+  del: b => { S.plan[b.dataset.list].splice(+b.dataset.i, 1); save(); render(); },
+  toggleGoal: b => { const g = S.plan.goals[+b.dataset.i]; g.done = !g.done; save(); render(); },
+  clearGoals: () => { S.plan.goals = S.plan.goals.filter(g => !g.done); save(); render(); },
+  toggleEnv: b => { const k = b.dataset.k; S.plan.env[k] = !S.plan.env[k]; save(); render(); },
+  theme: b => { S.settings.theme = b.dataset.val; save(); applyTheme(); render(); },
+  showBackup: () => {
+    $('#dataBox').innerHTML = `<p class="hint" style="margin-top:14px">Kopiere diesen Text und bewahre ihn sicher auf, zum Beispiel in einer privaten Notiz.</p>
+      <textarea id="backupTxt" readonly style="min-height:120px;font-size:.8rem">${esc(JSON.stringify(S))}</textarea>
+      <button class="btn small primary" data-action="copyBackup" style="margin-top:8px">Text kopieren</button>`;
+  },
+  copyBackup: async () => {
+    const t = $('#backupTxt');
+    try{ await navigator.clipboard.writeText(t.value); toast('Sicherung kopiert.'); }
+    catch(e){ t.focus(); t.select(); try{ document.execCommand('copy'); toast('Sicherung kopiert.'); }catch(_){ toast('Text ist markiert. Bitte manuell kopieren.'); } }
+  },
+  showRestore: () => {
+    $('#dataBox').innerHTML = `<p class="hint" style="margin-top:14px">Füge hier den Text einer Sicherung ein. Die aktuellen Daten werden dabei ersetzt.</p>
+      <textarea id="restoreTxt" style="min-height:120px;font-size:.8rem"></textarea>
+      <button class="btn small primary" data-action="restore" style="margin-top:8px">Sicherung einspielen</button>`;
+  },
+  restore: () => {
+    try{
+      const d = JSON.parse($('#restoreTxt').value);
+      if(!d || typeof d !== 'object' || !('checkins' in d)) throw 0;
+      S = merge(d); save(); applyTheme(); render(); toast('Sicherung eingespielt.');
+    }catch(e){ toast('Dieser Text ist keine gültige Sicherung.'); }
+  },
+  wipe: b => {
+    if(b.dataset.armed){ S = fresh(); save(); applyTheme(); render(); toast('Alle Daten wurden gelöscht.'); return; }
+    b.dataset.armed = '1'; b.textContent = 'Wirklich alles löschen? Nochmal tippen.'; b.style.color = 'var(--dawn)';
+    setTimeout(() => { if(b.isConnected){ delete b.dataset.armed; b.textContent = 'Alle Daten löschen'; b.style.color = ''; } }, 4000);
+  }
+};
+function addTo(list, sel){
+  const el = $(sel), v = el.value.trim(); if(!v) return;
+  S.plan[list].push(v); save(); render(); const n = $(sel); if(n) n.focus();
+}
+
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-action]'); if(!b) return;
+  const f = A[b.dataset.action]; if(f){ e.preventDefault(); f(b, e); }
+});
+document.addEventListener('input', e => {
+  const el = e.target, k = el.dataset.bind; if(!k || !O) return;
+  if(el.type === 'range'){
+    const v = +el.value;
+    if(O.type === 'sos') O.urgeNow = v; else O.data[k] = v;
+    const out = document.getElementById(el.id + 'Out'); if(out) out.textContent = v;
+  } else O.data[k] = el.value;
+});
+document.addEventListener('keydown', e => {
+  if(e.key === 'Enter' && e.target.dataset && e.target.dataset.enter){ e.preventDefault(); A[e.target.dataset.enter](); }
+  if(e.key === 'Escape' && O && O.type !== 'sos') closeOverlay();
+});
+
+$('#logoStar').setAttribute('points', star(12,12,11));
+applyTheme();
+render();
+</script>
+</body>
+</html>
