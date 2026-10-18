@@ -121,8 +121,8 @@ label.q{display:block;font-weight:600;margin:22px 0 8px}
 
 /* Navigation */
 nav.tabs{position:fixed;left:0;right:0;bottom:0;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px);z-index:20}
-nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr)}
-nav.tabs button{background:none;border:0;padding:10px 4px 12px;display:grid;justify-items:center;gap:3px;font-size:.78rem;color:var(--muted);cursor:pointer}
+nav.tabs .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(5,1fr)}
+nav.tabs button{background:none;border:0;padding:10px 4px 12px;display:grid;justify-items:center;gap:3px;font-size:.74rem;color:var(--muted);cursor:pointer}
 nav.tabs svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
 
@@ -155,6 +155,43 @@ nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
 .seg .chip{border-radius:12px;padding:12px;text-align:center}
 .help p{font-size:.97rem}
 .help a{color:var(--accent);font-weight:600}
+/* History */
+.cal-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:26px 0 10px}
+.cal-head h2{margin:0;font-size:1.15rem}
+.cal-nav{display:flex;gap:6px}
+.cal-nav button{width:40px;height:40px;border-radius:12px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:1.25rem;line-height:1}
+.cal-nav button:disabled{opacity:.35;cursor:default}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}
+.cal .wd{font-size:.78rem;color:var(--muted);padding-bottom:2px}
+.day{position:relative;aspect-ratio:1;border:0;border-radius:12px;background:none;cursor:pointer;font-size:.95rem;display:grid;place-items:center;padding:0;font-variant-numeric:tabular-nums}
+.day:hover{background:var(--accent-soft)}
+.day.today{font-weight:700;color:var(--accent)}
+.day.sel{background:var(--accent);color:var(--on-accent)}
+.day:disabled{color:var(--line);cursor:default;background:none}
+.day i{position:absolute;bottom:5px;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--accent)}
+.day i.rel{background:var(--dawn)}
+.day.sel i{background:var(--on-accent)}
+.day.sel i.rel{background:var(--dawn-soft)}
+#dayDetail{scroll-margin-top:16px}
+.entries{display:grid;gap:12px}
+.entry{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.entry.sos{border-left:4px solid var(--accent)}
+.entry.rel{border-left:4px solid var(--dawn)}
+.entry header{display:flex;justify-content:space-between;gap:12px;font-weight:600;margin-bottom:8px}
+.entry .tm{color:var(--muted);font-weight:500;font-variant-numeric:tabular-nums}
+.entry dl{margin:0;display:grid;gap:4px}
+.kv{display:grid;grid-template-columns:minmax(6.5em,9em) 1fr;gap:10px;font-size:.95rem}
+.kv dt{color:var(--muted)}
+.kv dd{margin:0;overflow-wrap:anywhere}
+.entry .sub{font-size:.88rem;color:var(--muted);font-weight:600;margin:12px 0 6px}
+.entry-note{margin:10px 0 0;padding-top:10px;border-top:1px solid var(--line);white-space:pre-line;font-family:"Newsreader",Georgia,serif;font-size:1.08rem;line-height:1.5}
+.entry .edit{margin-top:8px;padding:6px 0;background:none}
+.notes li{padding:0}
+.notes button{flex:1;display:block;text-align:left;background:none;border:0;padding:12px 0;cursor:pointer}
+.notes small{display:block;color:var(--muted);font-size:.82rem;margin-bottom:2px}
+.notes .nt{display:block;white-space:pre-line;overflow-wrap:anywhere}
+.chart .hit{fill:transparent;cursor:pointer}
+.other[hidden]{display:none}
 @media (prefers-reduced-motion: reduce){
   .breath .star{animation:none;transform:scale(.8)}
   .star,.timer .prg{transition:none}
@@ -174,6 +211,7 @@ nav.tabs button[aria-current="page"]{color:var(--accent);font-weight:600}
   <div class="in">
     <button data-action="nav" data-view="heute"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg>Today</button>
     <button data-action="nav" data-view="muster"><svg viewBox="0 0 24 24"><path d="M5 20v-8M12 20V5M19 20v-5"/></svg>Patterns</button>
+    <button data-action="nav" data-view="verlauf"><svg viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15.5" rx="2.5"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg>History</button>
     <button data-action="nav" data-view="plan"><svg viewBox="0 0 24 24"><path d="M10 6h10M10 12h10M10 18h10M4 6l1.3 1.3L7.5 5M4 12l1.3 1.3L7.5 11M4 18l1.3 1.3L7.5 17"/></svg>Plan</button>
     <button data-action="nav" data-view="impulse"><svg viewBox="0 0 24 24"><path d="M5 4.5A1.5 1.5 0 016.5 3H19v15H6.5A1.5 1.5 0 005 19.5z"/><path d="M5 19.5A1.5 1.5 0 006.5 21H19"/></svg>Reflections</button>
   </div>
@@ -219,9 +257,36 @@ const ENV = [
   ['fasting','Voluntary fasting planned (e.g. Mon and Thu)']
 ];
 
+const OTHER = TRIGGERS[TRIGGERS.length - 1];
+const T = {
+  loc:'en-US', cancel:'Cancel', skip:'Skip',
+  ciTitle:'Check-in', ciHint:'One minute. Honest matters more than good.',
+  ciSosTitle:'Quick check-in', ciSosHint:'Note down how it was just now. Later you’ll see what helps you most in emergency mode.',
+  qMood:'How are you today?', qMoodNow:'How are you feeling now?',
+  qHalt:'What applies right now?',
+  qUrgeStart:'How strong was the urge at the start?', qUrgeNow:'How strong is the urge now?',
+  scaleLo:'not at all', scaleHi:'very strong',
+  qTrig:'What triggered the urge?', otherLabel:'What exactly was it?', otherPh:'Describe it briefly',
+  qRel:'Was there a relapse?', yes:'Yes', no:'No',
+  noteLabel:'Note', optional:'(optional)', notePh:'What was going on?',
+  saveCi:'Save check-in', ciSaved:'Check-in saved.', toastOk:'Saved. One more urge overcome.',
+  histTitle:'History', histLead:'Tap a day to see all its entries and notes.',
+  prevM:'Previous month', nextM:'Next month', wd:['Mo','Tu','We','Th','Fr','Sa','Su'],
+  hasEntries:'has entries', lgEntry:'Entries', lgRel:'Relapse',
+  noEntriesDay:'No entries on this day.', doCheckin:'Do a check-in',
+  ciDaily:'Daily check-in', ciSos:'Check-in after emergency mode', sosUsed:'Emergency mode',
+  out:{ok:'Urge overcome', relapse:'Ended with a relapse'},
+  minutes:n => n === 1 ? '1 minute' : `${n} minutes`,
+  ciAfter:'Check-in afterwards', noSosCi:'No check-in recorded.',
+  relTitle:'Relapse reflection',
+  lMood:'Mood', lUrge:'Urge (start → now)', of10:'out of 10', lTrig:'Triggers', lRel:'Relapse', lWhen:'Time of day', lBefore:'Before', lHelped:'Would have helped', lChange:'Change',
+  edit:'Edit', notesTitle:'All notes', noNotes:'No notes yet. What you write in check-ins and after relapses will appear here.',
+  tapDay:'Tap a day to see its entries.'
+};
+
 /* ---------- Storage ---------- */
 const KEY = 'kompass:v1';
-const fresh = () => ({checkins:{}, sos:[], relapses:[], plan:{why:[], contacts:[], env:{}, goals:[], lessons:[]}, settings:{theme:'system'}});
+const fresh = () => ({checkins:[], sos:[], relapses:[], plan:{why:[], contacts:[], env:{}, goals:[], lessons:[]}, settings:{theme:'system'}});
 let storageOk = true;
 function load(){
   try{
@@ -230,9 +295,19 @@ function load(){
     return raw ? merge(JSON.parse(raw)) : fresh();
   }catch(e){ storageOk = false; return fresh(); }
 }
+function migrateCheckins(c){
+  if(Array.isArray(c)) return c;
+  return Object.entries(c || {}).map(([date, v], i) => {
+    const ts = v.ts || new Date(date + 'T12:00:00').getTime();
+    return {id:ts + i, date, ts, src:'daily', mood:v.mood ?? null, halt:v.halt || [],
+      urgeStart: typeof v.urgeStart === 'number' ? v.urgeStart : (typeof v.urge === 'number' ? v.urge : null),
+      urgeNow: typeof v.urgeNow === 'number' ? v.urgeNow : null,
+      triggers:v.triggers || [], otherTrigger:v.otherTrigger || '', relapse:v.relapse ?? null, note:v.note || ''};
+  });
+}
 function merge(d){
   const b = fresh();
-  return {checkins:d.checkins||{}, sos:d.sos||[], relapses:d.relapses||[], plan:{...b.plan, ...(d.plan||{})}, settings:{...b.settings, ...(d.settings||{})}};
+  return {checkins:migrateCheckins(d.checkins), sos:d.sos||[], relapses:d.relapses||[], plan:{...b.plan, ...(d.plan||{})}, settings:{...b.settings, ...(d.settings||{})}};
 }
 function save(){
   try{ localStorage.setItem(KEY, JSON.stringify(S)); }
@@ -296,7 +371,7 @@ function vHeute(){
   const h = new Date().getHours();
   const greet = h < 5 ? 'Hello' : h < 11 ? 'Good morning' : h < 18 ? 'Good afternoon' : 'Good evening';
   const late = h >= 21 || h < 5;
-  const ci = S.checkins[dk()];
+  const ci = dailyFor(dk());
   const week = S.sos.filter(s => s.outcome === 'ok' && Date.now() - s.ts < 7*864e5).length;
   return `
     <p class="date">${dayLabel(dk())}</p>
@@ -321,19 +396,37 @@ function vHeute(){
   `;
 }
 
+const clone = o => JSON.parse(JSON.stringify(o));
+const dailyFor = k => S.checkins.find(c => c.date === k && c.src === 'daily');
+function dayUrge(k){
+  const v = S.checkins.filter(c => c.date === k && typeof c.urgeStart === 'number').map(c => c.urgeStart);
+  return v.length ? Math.max(...v) : null;
+}
+function newCheckin(date, src, extra = {}){
+  return {date, src, mood:null, halt:[], urgeStart: src === 'sos' ? 5 : 0, urgeNow:0, triggers:[], otherTrigger:'', relapse:null, note:'', ...extra};
+}
+function otherField(d){
+  return `<div class="other" id="otherWrap"${(d.triggers || []).includes(OTHER) ? '' : ' hidden'}>
+    <label class="q" for="otherIn" style="margin-top:14px">${T.otherLabel}</label>
+    <input type="text" id="otherIn" data-bind="otherTrigger" value="${esc(d.otherTrigger || '')}" placeholder="${T.otherPh}">
+  </div>`;
+}
+function chainRelapse(c){
+  openOverlay({type:'relapse', step:0, date:c.date, data:{when: c.sosTs ? whenOf(c.sosTs) : null, triggers:[...(c.triggers || [])], otherTrigger:c.otherTrigger || '', before:c.note || '', helped:'', change:''}});
+}
 function relapseDaySet(){
   const s = new Set(S.relapses.map(r => r.date));
-  Object.entries(S.checkins).forEach(([k, v]) => { if(v.relapse) s.add(k); });
+  S.checkins.forEach(c => { if(c.relapse) s.add(c.date); });
   return s;
 }
 function avgUrge(fromDaysAgo, toDaysAgo){
   const vals = [];
   for(let i = fromDaysAgo; i > toDaysAgo; i--){
     const d = new Date(); d.setDate(d.getDate() - i + 1);
-    const c = S.checkins[dk(d)];
-    if(c && typeof c.urge === 'number') vals.push(c.urge);
+    const u = dayUrge(dk(d));
+    if(u !== null) vals.push(u);
   }
-  return vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length).toFixed(1) : null;
+  return vals.length ? (vals.reduce((a,b) => a+b, 0) / vals.length).toLocaleString(T.loc, {minimumFractionDigits:1, maximumFractionDigits:1}) : null;
 }
 function hbars(rows, cls = ''){
   const max = Math.max(1, ...rows.map(r => r[1]));
@@ -341,7 +434,7 @@ function hbars(rows, cls = ''){
 }
 
 function vMuster(){
-  const hasData = Object.keys(S.checkins).length || S.sos.length || S.relapses.length;
+  const hasData = S.checkins.length || S.sos.length || S.relapses.length;
   if(!hasData) return `<h1 style="margin-top:22px">Your patterns</h1>
     <div class="empty">No entries yet. Do your first check-in today. After a few days, your patterns will appear here: when urges come, what triggers them and how everything develops.</div>`;
 
@@ -363,9 +456,9 @@ function vMuster(){
   let bars = '';
   for(let i = 0; i < 30; i++){
     const d = new Date(); d.setDate(d.getDate() - 29 + i);
-    const k = dk(d), c = S.checkins[k], x = i*10 + 2;
-    if(c && typeof c.urge === 'number'){
-      const h = Math.max(2, c.urge * 10);
+    const k = dk(d), u = dayUrge(k), x = i*10 + 2;
+    if(u !== null){
+      const h = Math.max(2, u * 10);
       bars += `<rect class="bar${rel.has(k) ? ' rel' : ''}" x="${x}" y="${110 - h}" width="6" height="${h}" rx="1.5"/>`;
     } else if(rel.has(k)){
       bars += `<rect class="bar rel" x="${x}" y="104" width="6" height="6" rx="1.5"/>`;
@@ -373,10 +466,15 @@ function vMuster(){
       bars += `<rect class="tick" x="${x}" y="108" width="6" height="2"/>`;
     }
   }
+  for(let i = 0; i < 30; i++){
+    const d = new Date(); d.setDate(d.getDate() - 29 + i);
+    bars += `<rect class="hit" data-action="openDay" data-scroll="1" data-day="${dk(d)}" x="${i*10}" y="0" width="10" height="112"/>`;
+  }
   const d0 = new Date(); d0.setDate(d0.getDate() - 29);
   const chart = `<div class="chart"><svg viewBox="0 0 300 126" role="img" aria-label="Urge strength over the last 30 days">${bars}
     <text class="axis" x="2" y="123">${shortDate(d0)}</text><text class="axis" x="298" y="123" text-anchor="end">today</text></svg></div>
-    <div class="legend"><span><i style="background:var(--accent)"></i>Urge strength (0 to 10)</span><span><i style="background:var(--dawn)"></i>Day with relapse</span></div>`;
+    <div class="legend"><span><i style="background:var(--accent)"></i>Urge strength (0 to 10)</span><span><i style="background:var(--dawn)"></i>Day with relapse</span></div>
+    <p class="hint" style="margin-top:8px">${T.tapDay}</p>`;
 
   // Time of day
   const tc = Object.fromEntries(WHEN.map(w => [w, 0]));
@@ -386,13 +484,13 @@ function vMuster(){
 
   // Triggers
   const trg = {};
-  Object.values(S.checkins).forEach(c => (c.triggers || []).forEach(t => trg[t] = (trg[t] || 0) + 1));
+  S.checkins.forEach(c => (c.triggers || []).forEach(t => trg[t] = (trg[t] || 0) + 1));
   S.relapses.forEach(r => (r.triggers || []).forEach(t => trg[t] = (trg[t] || 0) + 1));
   const topT = Object.entries(trg).sort((a,b) => b[1] - a[1]).slice(0, 5);
 
   // HALT
   const hc = Object.fromEntries(HALT.map(h => [h, 0]));
-  Object.values(S.checkins).forEach(c => (c.halt || []).forEach(h => hc[h]++));
+  S.checkins.forEach(c => (c.halt || []).forEach(h => hc[h]++));
   const hTotal = Object.values(hc).reduce((a,b) => a+b, 0);
 
   // Months
@@ -478,7 +576,79 @@ function vImpulse(){
     <h2>All reflections</h2>${IMPULSE.filter(i => i !== t).map(impulseBlock).join('')}`;
 }
 
-const VIEWS = {heute:vHeute, muster:vMuster, plan:vPlan, impulse:vImpulse};
+let calM = null, selDay = null;
+const tm = ts => new Date(ts).toLocaleTimeString(T.loc, {hour:'2-digit', minute:'2-digit'});
+const kv = (l, v) => v ? `<div class="kv"><dt>${l}</dt><dd>${v}</dd></div>` : '';
+const trigText = c => (c.triggers || []).map(t => esc(t === OTHER && c.otherTrigger ? `${t}: ${c.otherTrigger}` : t)).join(', ');
+function ciBody(c){
+  const urge = typeof c.urgeStart === 'number' ? `${c.urgeStart}${typeof c.urgeNow === 'number' ? ' → ' + c.urgeNow : ''} ${T.of10}` : '';
+  return `<dl>${kv(T.lMood, esc(c.mood || ''))}${kv('HALT', esc((c.halt || []).join(', ')))}${kv(T.lUrge, urge)}${kv(T.lTrig, trigText(c))}${kv(T.lRel, c.relapse === true ? T.yes : c.relapse === false ? T.no : '')}</dl>
+    ${c.note ? `<p class="entry-note">${esc(c.note)}</p>` : ''}
+    <button class="btn quiet small edit" data-action="editEntry" data-id="${c.id}">${T.edit}</button>`;
+}
+function dayDetail(k){
+  const ci = S.checkins.filter(c => c.date === k);
+  const sos = S.sos.filter(x => dk(new Date(x.ts)) === k);
+  const rel = S.relapses.filter(r => r.date === k);
+  const items = [];
+  ci.filter(c => !c.sosTs || !sos.some(x => x.ts === c.sosTs)).forEach(c => items.push({ts:c.ts, html:
+    `<article class="entry"><header><span>${c.src === 'sos' ? T.ciSos : T.ciDaily}</span><span class="tm">${tm(c.ts)}</span></header>${ciBody(c)}</article>`}));
+  sos.forEach(x => {
+    const c = ci.find(e => e.sosTs === x.ts);
+    const min = Math.max(1, Math.round(((x.end || x.ts) - x.ts) / 60000));
+    const out = T.out[x.outcome];
+    items.push({ts:x.ts, html:`<article class="entry sos"><header><span>${T.sosUsed}</span><span class="tm">${tm(x.ts)}</span></header>
+      <p class="hint" style="margin:0 0 4px">${out ? out + ', ' : ''}${T.minutes(min)}</p>
+      ${c ? `<p class="sub">${T.ciAfter}</p>${ciBody(c)}` : `<p class="hint" style="margin:0">${T.noSosCi}</p>`}</article>`});
+  });
+  rel.forEach(r => items.push({ts:r.ts, html:`<article class="entry rel"><header><span>${T.relTitle}</span><span class="tm">${tm(r.ts)}</span></header>
+    <dl>${kv(T.lWhen, esc(r.when || ''))}${kv(T.lTrig, trigText(r))}${kv(T.lBefore, esc(r.before || ''))}${kv(T.lHelped, esc(r.helped || ''))}${kv(T.lChange, esc(r.change || ''))}</dl></article>`}));
+  items.sort((a, b) => a.ts - b.ts);
+  return `<section id="dayDetail"><h2>${dayLabel(k)}</h2>
+    ${items.length ? `<div class="entries">${items.map(i => i.html).join('')}</div>` : `<p class="hint">${T.noEntriesDay}</p>`}
+    ${k === dk() && !dailyFor(k) ? `<button class="btn primary" data-action="openCheckin" style="margin-top:12px">${T.doCheckin}</button>` : ''}
+  </section>`;
+}
+function allNotes(){
+  const L = [];
+  S.checkins.forEach(c => {
+    const t = [c.note, (c.triggers || []).includes(OTHER) && c.otherTrigger ? `${OTHER}: ${c.otherTrigger}` : ''].filter(Boolean);
+    if(t.length) L.push({ts:c.ts, date:c.date, label: c.src === 'sos' ? T.ciSos : T.ciDaily, text:t.join('\n')});
+  });
+  S.relapses.forEach(r => {
+    const t = [[T.lBefore, r.before], [T.lHelped, r.helped], [T.lChange, r.change]].filter(x => x[1] && x[1].trim()).map(x => `${x[0]}: ${x[1]}`);
+    if(r.otherTrigger && (r.triggers || []).includes(OTHER)) t.unshift(`${OTHER}: ${r.otherTrigger}`);
+    if(t.length) L.push({ts:r.ts, date:r.date, label:T.relTitle, text:t.join('\n')});
+  });
+  L.sort((a, b) => b.ts - a.ts);
+  if(!L.length) return `<p class="hint">${T.noNotes}</p>`;
+  return `<ul class="list notes">${L.map(n => `<li><button data-action="openDay" data-scroll="1" data-day="${n.date}"><small>${esc(n.label)}, ${dayLabel(n.date)}</small><span class="nt">${esc(n.text)}</span></button></li>`).join('')}</ul>`;
+}
+function vVerlauf(){
+  const today = dk();
+  if(!selDay || selDay > today) selDay = today;
+  if(!calM) calM = selDay.slice(0, 7);
+  const [y, m] = calM.split('-').map(Number);
+  const first = new Date(y, m - 1, 1), days = new Date(y, m, 0).getDate(), off = (first.getDay() + 6) % 7;
+  const rel = relapseDaySet();
+  const has = new Set([...S.checkins.map(c => c.date), ...S.sos.map(x => dk(new Date(x.ts))), ...S.relapses.map(r => r.date)]);
+  let cells = T.wd.map(w => `<span class="wd" aria-hidden="true">${w}</span>`).join('') + '<span></span>'.repeat(off);
+  for(let d = 1; d <= days; d++){
+    const k = `${y}-${pad(m)}-${pad(d)}`;
+    cells += `<button class="day${k === selDay ? ' sel' : ''}${k === today ? ' today' : ''}" data-action="openDay" data-day="${k}" aria-pressed="${k === selDay}" aria-label="${esc(dayLabel(k))}${has.has(k) ? ', ' + T.hasEntries : ''}"${k > today ? ' disabled' : ''}>${d}${has.has(k) ? `<i class="${rel.has(k) ? 'rel' : ''}"></i>` : ''}</button>`;
+  }
+  return `<h1 style="margin-top:22px">${T.histTitle}</h1>
+    <p class="lead">${T.histLead}</p>
+    <div class="cal-head"><h2>${first.toLocaleDateString(T.loc, {month:'long', year:'numeric'})}</h2>
+      <div class="cal-nav"><button data-action="calMove" data-dir="-1" aria-label="${T.prevM}">‹</button><button data-action="calMove" data-dir="1" aria-label="${T.nextM}"${calM >= today.slice(0, 7) ? ' disabled' : ''}>›</button></div></div>
+    <div class="cal">${cells}</div>
+    <div class="legend" style="margin-top:10px"><span><i style="background:var(--accent);border-radius:50%"></i>${T.lgEntry}</span><span><i style="background:var(--dawn);border-radius:50%"></i>${T.lgRel}</span></div>
+    ${dayDetail(selDay)}
+    <h2>${T.notesTitle}</h2>
+    ${allNotes()}`;
+}
+
+const VIEWS = {heute:vHeute, muster:vMuster, verlauf:vVerlauf, plan:vPlan, impulse:vImpulse};
 function render(){
   $('#main').innerHTML = VIEWS[view]();
   document.querySelectorAll('nav.tabs button').forEach(b => { if(b.dataset.view === view) b.setAttribute('aria-current','page'); else b.removeAttribute('aria-current'); });
@@ -577,24 +747,28 @@ function startBreath(){
 }
 
 function ovCheckin(){
-  const d = O.data;
-  return `<div class="ov-head"><span class="hint" style="margin:0">${dayLabel(O.date)}</span><button class="close" data-action="close">Cancel</button></div>
-    <h2 style="margin-top:14px">Check-in</h2>
-    <p class="hint">One minute. Honest matters more than good.</p>
-    <label class="q">How are you today?</label>
+  const d = O.data, sos = d.src === 'sos';
+  const range = id => { const v = typeof d[id] === 'number' ? d[id] : 0; return `<div class="range"><input type="range" id="${id}" min="0" max="10" value="${v}" data-bind="${id}"><output id="${id}Out">${v}</output></div>
+    <div class="scale"><span>${T.scaleLo}</span><span>${T.scaleHi}</span></div>`; };
+  return `<div class="ov-head"><span class="hint" style="margin:0">${dayLabel(d.date)}</span><button class="close" data-action="close">${sos && !O.editing ? T.skip : T.cancel}</button></div>
+    <h2 style="margin-top:14px">${sos ? T.ciSosTitle : T.ciTitle}</h2>
+    <p class="hint">${sos ? T.ciSosHint : T.ciHint}</p>
+    <label class="q">${sos ? T.qMoodNow : T.qMood}</label>
     <div class="chips">${MOODS.map(m => chip('mood', m, d.mood === m, true)).join('')}</div>
-    <label class="q">What applies right now?</label>
+    <label class="q">${T.qHalt}</label>
     <div class="chips">${HALT.map(h => chip('halt', h, d.halt.includes(h))).join('')}</div>
-    <label class="q" for="urge">How strong was the urge today?</label>
-    <div class="range"><input type="range" id="urge" min="0" max="10" value="${d.urge}" data-bind="urge"><output id="urgeOut">${d.urge}</output></div>
-    <div class="scale"><span>not at all</span><span>very strong</span></div>
-    <label class="q">What triggered it?</label>
+    <label class="q" for="urgeStart">${T.qUrgeStart}</label>
+    ${range('urgeStart')}
+    <label class="q" for="urgeNow">${T.qUrgeNow}</label>
+    ${range('urgeNow')}
+    <label class="q">${T.qTrig}</label>
     <div class="chips">${TRIGGERS.map(t => chip('triggers', t, d.triggers.includes(t))).join('')}</div>
-    <label class="q">Was there a relapse today?</label>
-    <div class="seg">${chip('relapse', 'No', d.relapse === false, true)}${chip('relapse', 'Yes', d.relapse === true, true)}</div>
-    <label class="q" for="note">Note <span style="font-weight:400;color:var(--muted)">(optional)</span></label>
-    <textarea id="note" data-bind="note" placeholder="What happened today?">${esc(d.note)}</textarea>
-    <div class="ov-foot"><button class="btn primary" data-action="saveCheckin">Save check-in</button></div>`;
+    ${otherField(d)}
+    <label class="q">${T.qRel}</label>
+    <div class="seg">${chip('relapse', T.no, d.relapse === false, true)}${chip('relapse', T.yes, d.relapse === true, true)}</div>
+    <label class="q" for="note">${T.noteLabel} <span style="font-weight:400;color:var(--muted)">${T.optional}</span></label>
+    <textarea id="note" data-bind="note" placeholder="${T.notePh}">${esc(d.note)}</textarea>
+    <div class="ov-foot"><button class="btn primary" data-action="saveCheckin">${T.saveCi}</button></div>`;
 }
 
 function ovRelapse(){
@@ -616,6 +790,8 @@ function ovRelapse(){
     <div class="chips">${WHEN.map(w => chip('when', w, d.when === w, true)).join('')}</div>
     <label class="q">What was going on before?</label>
     <div class="chips" style="margin-bottom:10px">${TRIGGERS.map(t => chip('triggers', t, d.triggers.includes(t))).join('')}</div>
+    ${otherField(d)}
+    <div style="height:10px"></div>
     <textarea data-bind="before" placeholder="For example: argument with my brother, then alone in my room on my phone.">${esc(d.before)}</textarea>
     <label class="q" for="helped">What would have helped you?</label>
     <textarea id="helped" data-bind="helped" placeholder="For example: calling someone sooner, taking the phone out of the room.">${esc(d.helped)}</textarea>
@@ -639,24 +815,31 @@ const A = {
     const v = b.dataset.val;
     if(v === 'more'){ O.step = 6; renderOverlay(); return; }
     if(v === 'discard'){ closeOverlay(); return; }
-    S.sos.push({ts:O.start, end:Date.now(), outcome:v, urgeEnd:O.urgeNow});
+    const start = O.start;
+    S.sos.push({ts:start, end:Date.now(), outcome:v, urgeEnd:O.urgeNow});
     save();
-    if(v === 'ok'){ closeOverlay(); toast('Saved. One more urge overcome.'); }
-    else openOverlay({type:'relapse', step:0, date:dk(), data:{when:whenOf(O.start), triggers:[], before:'', helped:'', change:''}});
+    openOverlay({type:'checkin', outcome:v, editing:false, data:newCheckin(dk(new Date(start)), 'sos', {sosTs:start, urgeNow:O.urgeNow ?? 0, relapse: v === 'relapse'})});
   },
   openCheckin: () => {
-    const k = dk(), c = S.checkins[k];
-    openOverlay({type:'checkin', date:k, data: c ? JSON.parse(JSON.stringify(c)) : {mood:null, halt:[], urge:0, triggers:[], relapse:null, note:''}});
+    const c = dailyFor(dk());
+    openOverlay({type:'checkin', editing:!!c, data: c ? clone(c) : newCheckin(dk(), 'daily')});
+  },
+  editEntry: b => {
+    const c = S.checkins.find(x => String(x.id) === b.dataset.id);
+    if(c) openOverlay({type:'checkin', editing:true, data:clone(c)});
   },
   saveCheckin: () => {
-    const d = O.data;
-    S.checkins[O.date] = {...d, ts:Date.now()};
+    const d = O.data, now = Date.now();
+    if(!d.triggers.includes(OTHER)) d.otherTrigger = '';
+    ['urgeStart', 'urgeNow'].forEach(k => { if(typeof d[k] !== 'number') d[k] = 0; });
+    const e = {...d, id: d.id || now, ts: d.ts || now};
+    const i = S.checkins.findIndex(c => c.id === e.id);
+    if(i >= 0) S.checkins[i] = e; else S.checkins.push(e);
     save();
-    const hasRel = S.relapses.some(r => r.date === O.date);
-    if(d.relapse === true && !hasRel){
-      openOverlay({type:'relapse', step:0, date:O.date, data:{when:null, triggers:[...d.triggers], before:d.note || '', helped:'', change:''}});
-      toast('Check-in saved.');
-    } else { closeOverlay(); toast('Check-in saved.'); }
+    const chain = e.relapse === true && (e.src === 'sos' ? !O.editing : !S.relapses.some(r => r.date === e.date));
+    const ok = e.src === 'sos' && O.outcome === 'ok' && !O.editing;
+    if(chain) chainRelapse(e); else closeOverlay();
+    toast(ok ? T.toastOk : T.ciSaved);
   },
   openRelapse: () => openOverlay({type:'relapse', step:0, date:dk(), data:{when:null, triggers:[], before:'', helped:'', change:''}}),
   relNext: () => { O.step++; renderOverlay(); },
@@ -667,11 +850,28 @@ const A = {
     if(d.change.trim()) S.plan.lessons.unshift({text:d.change.trim(), ts});
     save(); O.step = 3; renderOverlay();
   },
-  close: () => closeOverlay(),
+  close: () => {
+    if(O && O.type === 'checkin' && O.data.src === 'sos' && !O.editing){
+      if(O.outcome === 'relapse'){ chainRelapse(O.data); return; }
+      closeOverlay(); toast(T.toastOk); return;
+    }
+    closeOverlay();
+  },
+  openDay: b => {
+    selDay = b.dataset.day; calM = selDay.slice(0, 7);
+    const go = view !== 'verlauf' || b.dataset.scroll;
+    view = 'verlauf'; render();
+    if(go){ const el = $('#dayDetail'); if(el) el.scrollIntoView({block:'start'}); }
+  },
+  calMove: b => {
+    const [y, m] = calM.split('-').map(Number);
+    calM = dk(new Date(y, m - 1 + (+b.dataset.dir), 1)).slice(0, 7); render();
+  },
   toggle: b => {
     const arr = O.data[b.dataset.field], v = b.dataset.val, i = arr.indexOf(v);
     i >= 0 ? arr.splice(i,1) : arr.push(v);
     b.setAttribute('aria-pressed', i < 0);
+    if(v === OTHER){ const w = $('#otherWrap'); if(w){ w.hidden = i >= 0; if(i < 0) $('#otherIn').focus(); } }
   },
   pick: b => {
     const f = b.dataset.field;
@@ -742,7 +942,7 @@ document.addEventListener('input', e => {
 });
 document.addEventListener('keydown', e => {
   if(e.key === 'Enter' && e.target.dataset && e.target.dataset.enter){ e.preventDefault(); A[e.target.dataset.enter](); }
-  if(e.key === 'Escape' && O && O.type !== 'sos') closeOverlay();
+  if(e.key === 'Escape' && O && O.type !== 'sos') A.close();
 });
 
 $('#logoStar').setAttribute('points', star(12,12,11));
